@@ -51,12 +51,33 @@ describe "Users" do
     end
     
     describe "success" do
-      it "should ign a user in and out" do
+      it "should sign a user in and out" do
         user = Factory(:user)
         integration_sign_in(user)
         controller.should be_signed_in
         click_link "Sign out"
         controller.should_not be_signed_in
+      end
+    end
+  end
+  
+  describe "index" do
+    
+    describe "admin user" do
+      it "should show 'delete' links" do
+        admin = Factory(:user, :email => "admin@example.com", :admin => true)
+        integration_sign_in(admin)
+        visit users_path
+        response.should have_selector("a", :content => "delete")
+      end
+    end
+    
+    describe "non-admin user" do
+      it "should not show 'delete' links" do
+        user = Factory(:user)
+        integration_sign_in(user)
+        visit users_path
+        response.should_not have_selector("a", :content => "delete")
       end
     end
   end
